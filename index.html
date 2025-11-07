@@ -44,6 +44,7 @@
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                     <a href="#about" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-fhcg-red">About Us</a>
                     <a href="#process" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-fhcg-red">Our Process</a>
+                    <a href="#verify" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-fhcg-red">Verify Card</a>
                     <a href="#pricing" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium hover:border-fhcg-red">Pricing</a>
                     <a href="#submit" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-fhcg-red border-fhcg-red">Submit Now</a>
                 </div>
@@ -216,8 +217,38 @@
         </div>
     </section>
 
-    <!-- 4. What We Offer / Grading Scale -->
-    <section class="py-20">
+    <!-- 3.5. Card Verification Lookup -->
+    <section id="verify" class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-fhcg-dark sm:text-5xl border-b-4 border-fhcg-red inline-block pb-1">
+                    Verify Your Graded Card
+                </h2>
+                <p class="mt-4 text-lg text-gray-600">
+                    Enter the unique serial number found on the Foothill Card Grading label to view its digital certificate and grade details.
+                </p>
+            </div>
+
+            <div class="bg-gray-50 p-8 rounded-2xl shadow-xl border border-fhcg-red/30">
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <input type="text" id="serial-input" placeholder="Enter Serial Number (e.g., FHCG12345678)" 
+                           class="w-full sm:flex-grow p-3 border-2 border-gray-300 rounded-xl focus:border-fhcg-red focus:ring-fhcg-red uppercase" />
+                    <button onclick="lookupCard()" 
+                            class="w-full sm:w-auto px-8 py-3 text-base font-medium rounded-xl text-white bg-fhcg-dark hover:bg-gray-700 transition duration-300 transform hover:scale-[1.02]">
+                        Check Serial
+                    </button>
+                </div>
+                
+                <!-- Result Display Area -->
+                <div id="lookup-result" class="mt-8 pt-4 border-t border-gray-200">
+                    <p class="text-gray-500 italic text-center">Enter a serial number above to begin verification.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. What We Offer / Grading Scale (Section ID changed from #process to #offer to accommodate the new #verify section's logical placement, ensuring proper HTML structure for sequential sections) -->
+    <section class="py-20" id="offer"> 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-extrabold text-fhcg-dark sm:text-5xl border-b-4 border-fhcg-red inline-block pb-1">
@@ -316,6 +347,83 @@
 
     <!-- JavaScript for utility functions -->
     <script>
+        // Sample card data (simulating a database)
+        const gradedCards = {
+            "FHCG10012345": {
+                cardName: "Mickey Mantle Rookie",
+                year: 1952,
+                set: "Topps",
+                grade: "9.5",
+                subgrades: { centering: 9.5, surface: 9.5, corners: 9.5, edges: 10 },
+                certifiedDate: "2024-08-15"
+            },
+            "FHCG90001": {
+                cardName: "Charizard Holographic",
+                year: 1999,
+                set: "Base Set 1st Edition",
+                grade: "10.0",
+                subgrades: { centering: 10, surface: 10, corners: 10, edges: 10 },
+                certifiedDate: "2024-10-01"
+            },
+            "FHCG00550": {
+                cardName: "LeBron James RC",
+                year: 2003,
+                set: "Topps Chrome",
+                grade: "8.0",
+                subgrades: { centering: 8.5, surface: 8.0, corners: 7.5, edges: 8.0 },
+                certifiedDate: "2024-09-20"
+            }
+        };
+
+        function lookupCard() {
+            const input = document.getElementById('serial-input').value.trim().toUpperCase();
+            const resultDiv = document.getElementById('lookup-result');
+            
+            // Clear previous results
+            resultDiv.innerHTML = '';
+            
+            const cardData = gradedCards[input];
+            
+            if (cardData) {
+                // Card Found - Display Success
+                let subgradeHtml = Object.entries(cardData.subgrades).map(([key, value]) => 
+                    `<span class="text-sm font-semibold capitalize">${key}:</span> <span class="text-fhcg-dark">${value}</span>`
+                ).join(' | ');
+
+                resultDiv.innerHTML = `
+                    <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-xl shadow-inner">
+                        <p class="text-lg font-bold text-green-700 mb-4 flex items-center">
+                            <span class="mr-2 text-2xl">✅</span> Verification Successful: Official Foothill Grading
+                        </p>
+                        
+                        <h3 class="text-3xl font-extrabold text-fhcg-dark mb-2">${cardData.cardName} (${cardData.year})</h3>
+                        <p class="text-xl font-bold text-fhcg-red mb-4">Grade: ${cardData.grade}</p>
+
+                        <div class="grid sm:grid-cols-2 gap-y-2 text-gray-700 text-sm border-t pt-3">
+                            <p><span class="font-semibold">Serial:</span> ${input}</p>
+                            <p><span class="font-semibold">Set:</span> ${cardData.set}</p>
+                            <p><span class="font-semibold">Certified:</span> ${cardData.certifiedDate}</p>
+                            <p class="sm:col-span-2 mt-2">
+                                <span class="font-semibold text-fhcg-dark">Subgrades:</span> ${subgradeHtml}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Card Not Found - Display Error
+                resultDiv.innerHTML = `
+                    <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-xl shadow-inner">
+                        <p class="text-lg font-bold text-red-700 mb-2 flex items-center">
+                            <span class="mr-2 text-2xl">❌</span> Verification Failed
+                        </p>
+                        <p class="text-gray-700">The serial number **${input}** was not found in our database. Please double-check the number on your slab and try again.</p>
+                        <p class="text-sm mt-2 text-red-600 italic">If the problem persists, please contact customer support.</p>
+                    </div>
+                `;
+            }
+        }
+        window.lookupCard = lookupCard; // Expose to global scope for HTML button
+
         // Function to copy the email address to the clipboard
         function copyEmail() {
             const copyText = document.getElementById("email-to-copy");
@@ -349,6 +457,7 @@
                 }, 3000);
             }
         }
+        window.copyEmail = copyEmail; // Expose to global scope for HTML button
     </script>
 </body>
 </html>
