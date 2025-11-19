@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Population Report</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Population Report</h1>
+        <div id="cardInfo"></div>
+        <canvas id="populationChart"></canvas>
+        <p id="rarityInfo"></p>
+    </div>
+
+    <script src="population-data.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const serial = params.get('serial');
+
+        const resultDiv = document.getElementById('cardInfo');
+        const rarityDiv = document.getElementById('rarityInfo');
+
+        if (serial && cardPopulationData[serial]) {
+            const data = cardPopulationData[serial];
+
+            resultDiv.innerHTML = `<h2>Card Serial: ${serial}</h2>
+                                   <p>Total Graded: ${data.total}</p>`;
+
+            const ctx = document.getElementById('populationChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.grades),
+                    datasets: [{
+                        label: 'Population per Grade',
+                        data: Object.values(data.grades),
+                        backgroundColor: 'gold',
+                        borderColor: 'black',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            rarityDiv.innerHTML = `Rarity: ${(data.total < 10 ? 'Ultra Rare' : data.total < 50 ? 'Rare' : 'Common')}`;
+        } else {
+            resultDiv.innerHTML = `<p>Serial not found.</p>`;
+        }
+    </script>
+</body>
+</html>
